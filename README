@@ -1,0 +1,85 @@
+Buzea Alexandru-Mihai-Iulian 311CAb
+
+IMAGE EDITOR FOR NETPBM FORMAT IMAGES
+
+I developed an image editor for the following NETPBM formats:
+
+P1 : ASCII file, black and white image, pixels are 0 or 1
+P2 : ASCII file, gray image, pixels are from 0 to a certain maximal value
+     representing gray tones (maxvalue cannot exceed 255)
+P3 : ASCII file, color image, RGB format, pixels are from 0 to maxvalue
+	 (maxvalue cannot exceed 255)
+P4 : binary file, black and white image, pixels are bytes with the value 0
+	 or 1
+P5 : binary file, gray image, pixels are from 0 to a certain maximal value
+	 representing gray tones (maxvalue cannot exceed 255)
+P6 : binary file, color image, RGB format, pixels are from 0 to maxvalue
+	 (maxvalue cannot exceed 255)
+
+General description :
+
+For loading and modifying the image, I simultaneously used two images
+(unsigned char ** and color_t **). It is important to mention that I used
+two typedefs: color_t (which models a color pixel in RGB format) and
+selected_t (which records, at any time, the selected area from the image).
+At least one of the two images must be NULL at all times (we can't have loaded)
+more than one image. The editor supports several commands in CLI and filters,
+some of them are available just for some types of images. 
+
+The supported commands:
+
+1. LOAD
+
+The "LOAD <filepath>" command given in CLI will load in the memory the image,
+no matter its type. For this to happen, I created a central function where I
+parsed the filename and other important data. The parsing of the image is a
+very different operation for each type of image, so I designed a load function
+for each type. I took in consideration the situation where the file with
+given name does not exist and printed the expected output.
+
+2. SAVE
+
+The "SAVE <filepath> /ascii/" command given in CLI will save the image at the
+given path. For this to happen, I created a central function and then 4 other
+functions in which I printed the image (color or gray/black&white) in an
+ASCII/binary file type.
+
+3. SELECT
+
+The "SELECT <x1> <y1> <x2> <y2>" or "SELECT ALL" command in CLI will select
+the area (more explicitly, this command will update the selected_t structure)
+based on the input command. It works the same for all image types.
+
+4. ROTATE
+
+The "ROTATE <angle>" command given in CLI will rotate the current selected
+area with the given angle, if it is valid. The main challenge was to determine
+the new expressions for position (line and column). Because of the different
+datatypes, it was necessary to make more functions, each one for every possible
+situation (color or non-color image, rotate all image or just a selection, 
+rotate with 90, 180, 270 degrees to the left or to the right). As a bonus,
+I implemented support for every angle which is a multiple of 90 degrees,
+therefore a valid angle. For invalid/impossible situations, the expected
+output is printed.
+
+5. CROP
+
+The "CROP" command given in CLI with no arguments will crop the current
+selected area. Again, because of the different datatypes, I needed to make
+a different function for each situation. After CROP, the whole new image
+will be selected .
+
+6. SEPIA / GRAYSCALE
+
+The two commands "SEPIA" and "GRAYSCALE" given in CLI with no arguments
+will apply the desired filter to the current selection. This means that the
+values of the pixels in the selection are modified accordingly. Filters are
+available just for color images. If one wants to apply this filter to gray
+or black&white image, a suitable output is printed.
+
+7. EXIT 
+
+The "EXIT" command given in CLI with no arguments exits the program succesfully
+by deallocation of all resources.
+
+For all commands, a suitable output will be printed.
